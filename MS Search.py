@@ -2,6 +2,9 @@ import time
 import random
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait  # Import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC  # Import EC for expected conditions
 from selenium.webdriver.edge.service import Service
 from selenium.webdriver.edge.options import Options
 import nltk
@@ -54,22 +57,45 @@ def scroll_page(driver):
     print(f"Scrolled the page {num_scrolls} times with random distances.")
 
 # Perform searches
-def perform_search(driver, num_searches=5):
+def perform_search(driver, num_searches=10):
     driver.get("https://www.bing.com")  # Default Edge search engine
-    for _ in range(num_searches):
+    
+    # Define the threshold for reload
+    reload_after = random.randint(5, 10)
+    search_count = 0
+
+    for i in range(num_searches):
         sentence = random_sentence()
-        search_box = driver.find_element("name", "q")  # Search box element
+        print(f"Performing search: '{sentence}'")
+        search_box = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.NAME, "q"))
+        )  # Wait for the search box to appear
         search_box.clear()
         search_box.send_keys(sentence + Keys.RETURN)
         
-        # Scroll the page randomly between searches
-        time.sleep(2)  # Short pause to ensure the page loads
+        # Wait for search results to load
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "b_results"))
+        )  # Adjust selector based on Bing's search results container
+        
+        # Scroll the page after results are loaded
         scroll_page(driver)
+        
+        # Increment search counter
+        search_count += 1
 
-        # Random delay between 15 and 30 seconds
+        # Check if it's time to reload the page
+        if search_count >= reload_after:
+            print(f"Reloading Bing search page after {search_count} searches...")
+            driver.get("https://www.bing.com")
+            search_count = 0  # Reset counter
+            reload_after = random.randint(5, 10)  # Set a new random threshold
+        
+        # Random delay between 10 and 15 seconds
         delay = random.uniform(10, 15)
         print(f"Waiting for {delay:.2f} seconds before the next search...")
         time.sleep(delay)
+
 
 # Main Function
 if __name__ == "__main__":
