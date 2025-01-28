@@ -42,6 +42,18 @@ def random_sentence(min_words=4, max_words=10):
     # Capitalize the first word and join the words into a sentence
     return " ".join(sentence).capitalize()
 
+# Scroll the page down and up randomly between 3 and 5 times
+def scroll_page(driver):
+    num_scrolls = random.randint(3, 5)
+    for _ in range(num_scrolls):
+        scroll_distance = random.randint(200, 800)  # Random scroll distance
+        driver.execute_script(f"window.scrollBy(0, {scroll_distance});")  # Scroll down
+        time.sleep(random.uniform(1.5, 3))  # Random pause
+        driver.execute_script(f"window.scrollBy(0, {-scroll_distance});")  # Scroll up
+        time.sleep(random.uniform(1.5, 3))  # Random pause
+    print(f"Scrolled the page {num_scrolls} times.")
+
+
 # Perform searches
 def perform_search(driver, num_searches=5):
     driver.get("https://www.bing.com")  # Default Edge search engine
@@ -52,6 +64,10 @@ def perform_search(driver, num_searches=5):
         search_box.clear()
         search_box.send_keys(sentence + Keys.RETURN)
         
+        # Scroll the page randomly between searches
+        time.sleep(2)  # Short pause to ensure the page loads
+        scroll_page(driver)
+
         # Random delay between  and  seconds
         delay = random.uniform(10, 15)
         print(f"Waiting for {delay:.2f} seconds before the next search...")
