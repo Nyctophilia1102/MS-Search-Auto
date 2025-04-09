@@ -17,3 +17,5 @@ Steps:
 Replace "path/to/msedgedriver" with the path to the Edge WebDriver on your machine.
 
 Run the script by executing python script_name.py in the terminal.
+
+For Cooldown is stop after 5 search for 16 minutes
