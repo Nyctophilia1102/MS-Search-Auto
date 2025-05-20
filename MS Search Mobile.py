@@ -13,12 +13,27 @@ from nltk.corpus import words, brown
 # Download required NLTK corpora
 nltk.download("words")
 nltk.download("brown")
+# List of random mobile devices for emulation
+MOBILE_DEVICES = [
+    "Pixel 3",
+    "Samsung Galaxy S20 Ultra",
+    "Samsung Galaxy A51/71",
+]
 
-# Setup Edge WebDriver
+# Setup Edge WebDriver for mobile emulation
 def setup_driver():
     edge_options = Options()
     edge_options.add_argument("--start-maximized")
-    service = Service("D:\msedgedriver.exe")  # Replace with your WebDriver path
+    
+    # Select a random mobile device
+    random_device = random.choice(MOBILE_DEVICES)
+    print(f"Emulating device: {random_device}")
+    
+    # Mobile emulation settings
+    mobile_emulation = {"deviceName": random_device}
+    edge_options.add_experimental_option("mobileEmulation", mobile_emulation)
+    
+    service = Service("D:\\msedgedriver.exe")  # Replace with your WebDriver path
     return webdriver.Edge(service=service, options=edge_options)
 
 # Generate random sentences with a random number of words between 4 and 10
@@ -40,21 +55,15 @@ def random_sentence(min_words=4, max_words=10):
 
 # Scroll the page down and up randomly between 3 and 5 times
 def scroll_page(driver):
-    num_scrolls = random.randint(3, 5)  # Random number of scrolls (3 to 5)
+    num_scrolls = random.randint(3, 5)
     for _ in range(num_scrolls):
-        # Randomize the scroll down and up distances
-        scroll_down_distance = random.randint(200, 800)  # Scroll down distance
-        scroll_up_distance = random.randint(200, 800)    # Scroll up distance
-        
-        # Scroll down
-        driver.execute_script(f"window.scrollBy(0, {scroll_down_distance});")
-        time.sleep(random.uniform(1.5, 3))  # Random pause after scrolling down
-        
-        # Scroll up
-        driver.execute_script(f"window.scrollBy(0, -{scroll_up_distance});")
-        time.sleep(random.uniform(1.5, 3))  # Random pause after scrolling up
-    
-    print(f"Scrolled the page {num_scrolls} times with random distances.")
+        scroll_distance = random.randint(200, 800)  # Random scroll distance
+        driver.execute_script(f"window.scrollBy(0, {scroll_distance});")  # Scroll down
+        time.sleep(random.uniform(1.5, 3))  # Random pause
+        driver.execute_script(f"window.scrollBy(0, {-scroll_distance});")  # Scroll up
+        time.sleep(random.uniform(1.5, 3))  # Random pause
+    print(f"Scrolled the page {num_scrolls} times.")
+
 
 # Perform searches
 def perform_search(driver, num_searches=10):
@@ -96,7 +105,7 @@ def perform_search(driver, num_searches=10):
         print(f"Waiting for {delay:.2f} seconds before the next search...")
         time.sleep(delay)
 
-
+# Main Function
 # Main Function
 if __name__ == "__main__":
     max_retries = 5
